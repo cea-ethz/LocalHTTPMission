@@ -8,6 +8,12 @@ import java.util.Enumeration;
 
 import http.*;
 
+import com.cage.zxing4p3.*;
+
+ZXING4P zxing4p;
+
+PImage  QRCode = null;;
+
 SimpleHTTPServer server;
 
 SDrop drop;
@@ -26,6 +32,8 @@ void setup() {
   server.serve("mission.json");
 
   drop = new SDrop(this);
+  
+  zxing4p = new ZXING4P();
 
   NetworkInterface mainInterface = null;
 
@@ -39,6 +47,9 @@ void setup() {
       }
     }
     localIp = mainInterface.getInterfaceAddresses().get(0).getAddress().toString();
+    localIp = localIp.substring(1,localIp.length());
+    
+    QRCode = zxing4p.generateQRCode("http://" + localIp + ":8000/mission.json", 200, 200);
   }
   catch(Exception e) {
   }
@@ -50,6 +61,10 @@ public void draw() {
   text("Server IP : " + localIp, 10, 20);
   text("Mission Name : " + missionName,10,40);
   text("Mission Has " + eventCount + " events",10,60);
+  
+  if (QRCode != null) {
+     image(QRCode, (width / 2) - (QRCode.width / 2),height - QRCode.height); 
+  }
 }
 
 void dropEvent(DropEvent dropEvent) {
